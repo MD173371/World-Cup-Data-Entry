@@ -1,0 +1,157 @@
+Pseudocode: Team Data Entry
+Author: Michael Durkan
+Date: 1st October 2023
+Date last modified: 14th October 2023 
+Purpose: Allow user to input team details, and store details in csv file
+
+BEGIN DataEntry
+    BEGIN MAIN
+        printHeader()                                                      	 
+        numTeams <- inputNumTeams()                                        	
+        MAKE array OF Team objects size numTeams                           	
+        teamArray <- addNewTeams(teamArray)                                	        
+        listData(teamArray)                                                	
+        exportTeams(teamArray)                                             	
+    END MAAIN
+    
+    METHOD: printHeader
+    IMPORT: none
+    EXPORT: none
+    ASSERTION: Welcome the user by printing header
+    ALGORITHM:
+    	PRINT "Welcome to the FIFA WWC Data Entry Program"
+	
+    METHOD: inputNumTeams
+    IMPORT: none
+    EXPORT: outNumTeams (Integer)
+    ASSERTION: ask user with prompt for number of teams and return in outNumTeams integer
+    ALGORITHM:
+        outNumTeams <- getInt(1,32,"How many teams' data are you planning to enter?", "Enter an amount of teams from 1 to 32") 
+        RETURN outNumTeams
+
+    METHOD: getInt
+    IMPORT: pMin (Integer), pMax (Integer), pPrompt (String), 
+    EXPORT: outInt (Integer)
+    ASSERTION: Ask user with String pPrompt for integer between pMin and pMax, OutRangeError print when input outside range
+    ALGORITHM:
+        validInput <- FALSE
+        outInt <- 0
+        WHILE NOT validInput is TRUE                                        
+            TRY                                                             
+                DO                                                          
+                    outInt <- ASK USER WITH PROMPT pPrompt                  
+                    IF outInt < pMin) OR outInt > pMax THEN                 
+                        PRINT pOutRangeError
+                    ENDIF
+                WHILE outInt < pMin OR outInt >pMax 
+                validInput <- TRUE                                          
+            ENDTRY
+            CATCH InputMismatchException error                              
+                PRINT "Enter an integer number character"
+			ENDCATCH        
+       RETUN outInt
+    
+    METHOD: addNewTeams
+    IMPORT: pTeamArray (Team), pNumTeams (Integer)
+    EXPORT: pTeamArray (Team)
+    ASSERTION: Ask User with prompt for the details of teams of teamNum number of teams
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray             
+        FOR i <- 0 TO numTeams INCREMENT i by 1                             
+            PRINT "Enter the data:"          
+            teamName <- getString("Team Name:")      
+            teamCode <- getString("Team Code:")      
+            goalsScored <- getInt(0,200,"Goals Scored by the Team:","Enter an amount of goals from 0 to 200")    
+            goalsLost <- getInt(0,200,"Goals Scored Against the Team:","Enter an amount of goals from 0 to 200")
+            teamGroup <- getChar("Group:")         
+            pTeamArray[i] <- Team(teamName, teamCode, goalsScored, goalsLost, teamGroup)   
+        ENDFOR
+        RETURN pTeamArray;
+    
+    METHOD: getString
+    IMPORT: pPrompt (String)
+    EXPORT: outString (String)
+    ASSERTION: Ask user for a string with prompt, handle errors and exceptions
+    ALGORITHM: 
+        boolean validInput <- false
+        outString <- ""
+        WHILE NOT validInput                                                
+            TRY   
+                DO                                                          
+                    outString <- ASK USER WITH PROMPT pPrompt
+                    outStringLength <- LENGTH OF outString                  
+                    IF outString IS EMPTY OR outString IS NULL THEN          
+             			PRINT "Empty-null string, please re-enter"
+                    ENDIF
+                    IF FIRST CHARACTER OF outString IS ' ' OR LAST CHARACATER OF outString IS ' ' THEN 
+                        PRINT "Error in formatting, space before or after word."
+                    ENDIF   
+                WHILE outString IS EMPTY OR outString IS NULL OR FIRST CHARACTER OF outString IS ' ' OR LAST CHARACATER OF outString IS ' '
+                validInput <- TRUE 
+                ENDWHILE                                                    
+            CATCH InputMismatchException error              
+                PRINT "Something went wrong! The error: " + error
+            ENDCATCH
+            CATCH StringIndexOutOfBoundsException error                     
+            ENDCATCH
+        ENDWHILE
+        RETURN outString;
+    
+    METHOD: getChar
+    IMPORT: pPrompt (String)
+    EXPORT: outChar (Character)
+    ASSERTION: Ask for a character with prompt, handle errors and exceptions
+    ALGORITHM:
+        validInput <- false;
+        outChar = ' '
+        WHILE NOT validInput                                                
+            TRY
+                WHILE outChar IS NOT 'A' OR outChar IS NOT 'B' OR outChar IS NOT 'C' OR outChar IS NOT 'D' OR outChar IS NOT 'E' OR outChar IS NOT 'F' OR outChar IS NOT 'G' OR outChar IS NOT 'H'                                                
+                    outChar <- ASK USER WITH PROMPT pPROMPT
+                    IF outChar IS NOT 'A' OR outChar IS NOT 'B' OR outChar IS NOT 'C' OR outChar IS NOT 'D' OR outChar IS NOT 'E' OR outChar IS NOT 'F' OR outChar IS NOT 'G' OR outChar IS NOT 'H' THEN
+                        PRINT "Team group invalid, enter group A, B, C, D, E, F, G or H"
+                    ENDIF
+                validInput <- TRUE
+                ENDWHILE
+            ENDTRY                                                          
+            CATCH InputMismatchException error
+                PRINT "Something went wrong! The error: " + error
+            ENDCATCH
+        ENDWHILE
+        RETURN outChar
+    
+    METHOD: listData
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Print a list of the current data in the Team Objects within the Array
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray
+        PRINT "The current data looks like this:"
+        FOR i <- 0 TO numTeams INRCREMENT BY 1                              
+            teamNum <- i + 1
+            PRINT teamNum + ": " + pTeamArray[i]                             
+            PRINT pTeamArray[i].toFileString()                              
+        ENDFOR
+    
+    METHOD: exportTeams
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Export the Team objects from teamArray into a csv file
+    ALGORITHM:
+        FileOutputStream fileStrm <- null
+        numTeams <- LENGTH OF pTeamArray
+        newFileName <- getString("Please enter export csv file name:")
+        TRY
+            fileStrm <- FileOutputStream(newFileName)           
+            pw <- PrintWriter(fileStrm)
+            CALL println("Team Name,Team Code,Goals For,Goals Against,Group") ON pw
+            FOR int i = 0 TO numTeams INCREMENT BY 1
+                CALL println(pTeamArray[i].toFileString() ON pw             
+            ENDFOR
+        ENDTRY
+        CATCH IOException e
+		ENDCATCH
+        PRINT "Error in writing to file: " + e.getMessage()
+		
+END DataEntry
+

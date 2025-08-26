@@ -1,0 +1,242 @@
+Team Class Pseudocode
+Name: Michael Durkan
+Purpose: Create and utilize Team objects for programs 1 + 2
+Date: October 1st 2023
+Date last modified: 11th October 2023 
+
+CLASS Team
+    CLASS FIELDS:
+        teamName (String)
+        teamCode (String)
+        goalsScored (Integer)
+        goalsLost (Integer)
+        teamGroup (Character)
+    
+    DEFAULT CONSTRUCTOR
+    IMPORT: none
+    EXPORT: none
+    ASSERTION: Create a Team object with the deafult values
+    ALGORITHM:
+        teamName    <- DefaultTeam (String)
+        teamCode    <- DEF (String)
+        goalsScored <- 42 (Integer)
+        goalsLost   <- 42 (Integer)
+        teamGroup   <- E (Character)
+
+    COPY CONSTRUCTOR
+    IMPORT: pTeam (Team)
+    EXPORT: none
+    ASSERTION: Create a Copy of the import team object
+    ALGORITHM:
+        teamName    <- pTeam.getTeamName()
+        teamCode    <- pTeam.getTeamCode()
+        goalsScored <- pTeam.getGoalsScored()
+        goalsLost   <- pTeam.getGoalsLost()
+        teamGroup   <- pTeam.getTeamGroup()
+    
+    CONSTRUCTOR WITH PARAMETERS
+    IMPORT: pTeamName (String), pTeamCode (String), pGoalsScored (Integer), pGoalsLost (Integer), pTeamGroup (Character)
+    EXPORT: none
+    ASSERTION: Create team object with imported values, if values are valid
+    ALGORITHM: 
+        IF validTeamName(pTeamName) = true
+            teamName    <- pTeamName
+        IF validTeamCode(pTeamCode) = true
+            teamCode    <- pTeamCode
+        IF validGoalsScored(pGoalsScored) = true
+            goalsScored <- pGoalsScored
+        IF validGoalsLost(pGoalslost) = true
+            goalsLost   <- pGoalsLost
+        IF validTeamGroup(pTeamGroup) = true
+            teamGroup   <- pTeamGroup 
+    
+    ACCESSOR: getTeamName
+    IMPORT: none
+    EXPORT: teamName (String)
+    ASSERTION: Return the Team Name
+    ALGORITHM:
+        EXPORT COPY OF teamName 
+    
+    ACCESSOR: getTeamCode
+    IMPORT: none
+    EXPORT: teamCode (String)
+    ASSERTION: Return the Team Code
+    ALGORITHM:
+        EXPORT COPY OF teamCode
+    
+    ACCESSOR: getGoalsScored
+    IMPORT: none
+    EXPORT: goalsScored (Intger)
+    ASSERTION: Return the goals scored by team
+    ALGORITHM:
+        EXPORT COPY OF goalsScored
+
+    ACCESSOR: getGoalsLost
+    IMPORT: none
+    EXPORT: goalsLost (Integer)
+    ASSERTION: Return the goals scored against the team
+    ALGORITHM:
+        EXPORT COPY of goalsLost
+
+    ACCESSOR: getTeamGroup
+    IMPORT: none
+    EXPORT: teamGroup
+    ASSERTION: Return the group of team
+    ALGORITHM:
+        EXPORT COPY of teamGroup
+    
+    ACCESSOR: toString
+    IMPORT: none
+    EXPORT: stringValue (String)
+    ASSERTION: Exports readable string of the values within team object
+        RETURN "Teams name: " + teamName +
+               "Teams code: " + teamCode +
+               "Teams goals scored: " + goalsScored +
+               "Goals scored against team: " + goalsLost +
+               "Teams group: " + teamGroup 
+
+    ACCESSOR: equals
+    IMPORT: inObject (object)
+    EXPORT: isEqual (Boolean)
+    ASSERTION: compares the equality of two team objects
+    ALGORITHM:
+        isEqual <- false
+        IF inObject IS A Team THEN
+            TRANSFORM inObject TO Team named inTeam
+            IF teamName = inTeam.getTeamName() THEN
+                IF teamCode = inTeam.getTeamCode() THEN
+                    IF goalsScored = inTeam.getGoalsScored() THEN
+                        IF goalsLost = inTeam.getGoalsLost() THEN
+                            IF teamGroup = inTeam.getTeamGroup() THEN
+                                isEqual <- TRUE
+                            ENDIF
+                        ENDIF
+                    ENDIF
+                ENDIF
+            ENDIF
+        ENDIF
+
+    MUTATOR: setTeamName
+    IMPORT: pTeamName (String)
+    EXPORT: none
+    ASSERTION: State of teamName is updated to pTeamName value if valid
+    ALGORITHM:
+        IF validTeamName(pTeamName) = true
+            teamName <- pTeamName
+        ENDIF
+        ELSE
+            teamName <- DefaultTeam
+        ENDELSE
+
+    MUTATOR: setTeamCode
+    IMPORT: pTeamCode (String)
+    EXPORT: none
+    ASSERTION: State of teamCode is updated to pTeamCode value if valid
+    ALGORITHM:
+        IF validTeamCode(pTeamCode) = true
+            teamCode <- pTeamCode
+        ENDIF
+        ELSE
+            teamCOde <- DEF
+        ENDELSE    
+
+    MUTATOR: setGoalsScored
+    IMPORT: pGoalsScored (Integer)
+    EXPORT: none
+    ASSERTION: State of goalsScored is updated to pGoalsScored value if valid
+    ALGORITHM:
+        IF validGoalsScored(pGoalsScored) = true
+            goalsScored <- pGoalsScored
+        ENDIF
+        ELSE
+            goalsScored <- 42
+        ENDELSE
+        
+    MUTATOR: setGoalsLost
+    IMPORT: pGoalsLost (Integer)
+    EXPORT: none
+    ASSSERTION: State of goalsLost is updated to pGoalsLost value if valid
+    ALGORITHM:
+        IF validGoalsLost(pGoalsLost) = true
+            goalsLost <- pGoalsLost
+        ENDIF
+        ELSE
+            goalsScored <- 42
+        ENDELSE
+    
+    MUTATOR: setTeamGroup
+    IMPORT: pTeamGroup (Character)
+    EXPORT: none
+    ASSERTION: Stae of teamGroup is updated to pTeamGroup value if valid
+    ALGORITHM:
+        IF validTeamGroup(pTeamGroup) = true
+            teamGroup <- pTeamGroup
+        ENDIF
+        ELSE
+            teamGroup <- E
+        ENDELSE
+    
+    METHOD: validTeamName
+    IMPORT: pTeamName (String)
+    EXPORT: isValidTeamName (Boolean)
+    ASSERTION: Validates if pTeamName is possible value
+    ALGORITHM:
+        isValidName <- false
+        IF pTeamname NOT EMPTY AND pTeamName NOT null
+            isValidName <- true
+        ENDIF
+        EXPORT isValidName
+    
+    METHOD: validTeamCode
+    IMPORT: pTeamCode (String)
+    EXPORT: isValidTeamCode (Boolean)
+    ASSERTION: Validates if pTeamCode is possible value
+    ALGORITHM:
+        isValidCode <- false
+        IF pTeamCode NOT EMPTY AND pTeamCode NOT null
+            isValidCode <- true
+        ENDIF
+        EXPORT isValidCode
+    
+    METHOD: validGoalsScored
+    IMPORT: pGoalsScored (Integer)
+    EXPORT: isValidGoalsScored (Boolean)
+    ASSETION: Validates if pGoalsScored is possible value
+    ALGORITHM:
+        isValidGoalsScored <- false
+        IF pGoalsScored >= 0
+            isValidGoalsScored <- true
+        ENDIF
+        EXPORT isValidGoalsScored
+    
+    METHOD: validGoalsLost
+    IMPORT: pGoalsLost (Integer)
+    EXPORT: isValidGoalsLost (Boolean)
+    ASSERTION: ValidDates if pGoalsScored is possible value
+    ALGORITHM:    
+        isValidGoalsLost <- false
+        IF pGoalsLost >= 0
+            isValidGoalsLost <- true
+        ENDIF
+        EXPORT isValidGoalsLost
+    
+    METHOD: validTeamGroup
+    IMPORT: pTeamGroup (Character)
+    EXPORT: isValidTeamGroup (Boolean)
+    ASSERTION: Validates if pTeamGroup is possible value
+    ALGORITHM:
+        isValidTeamGroup <- false
+        IF pTeamGroup = A OR pTeamGroup = B OR pTeamGroup = C OR pTeamGroup = D
+            isValidTeamGroup <- true
+        ENDIF
+        EXPORT isValidTeamGroup
+
+    METHOD: toFileString
+    IMPORT: none
+    EXPORT: fileString (String)
+    ASSERTION: Export Object as String of values, in a row seperated by commas
+    ALGORITHM:
+        fileString = "" (String)
+        fileString = teamName + "," + teamCode + "," + goalsScored + "," + goalsLost + "," + teamGroup + ","
+        RETURN fileString 
+END CLASS

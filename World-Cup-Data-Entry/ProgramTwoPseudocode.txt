@@ -1,0 +1,453 @@
+Team Data Analysis Pseudocode
+Author: Michael Durkan
+Date: 1st October 2023
+Date last modified: 14th October 2023 
+Purpose: Allow the user to import team data from a csv and analyse the data
+
+BEGIN DataAnalysis
+    BEGIN MAIN
+        numTeams <- 0 (Integer)
+        printHeader()                                                                               
+        WHILE numTeams = 0                                                                          
+            fileName <- inputFileName()                                                             
+            numTeams <- countFileTeams(fileName)                                                    
+        ENDWHILE
+        CREATE array of Teams SIZE numTeams
+        teamArray <- readFile(fileName, teamArray)                                                  
+        groupOrOverallAnalysis(teamArray)                                                           
+    END MAIN
+  
+    METHOD: printHeader
+    IMPORT: none
+    EXPORT: none
+    ASSERTION: Welceme user by printing header
+    ALGORITHM:
+        PRINT "Welcome to the FIFA WWC Data Analysis Program
+    
+    METHOD: inputFileName
+    IMPORT: none
+    EXPORT: outFileName (string)
+    ASSERTION: Ask user with prompt for file name of data to be read
+    ALGORITHM:
+        outFileName <- getString("Enter the name of the file containing the data:")                 
+        RETURN outFileName
+
+    METHOD: countFileTeams
+    IMPORT: pFileName (String)
+    EXPORT: outLineNum (Integer)
+    ASSERTION: Count the number of lines and therefore teams stored within csv file and return
+    ALGORITHM:
+        TRY
+            fileStream <- OPENFILE pFileName
+            outLineNum <- 0 (Integer)
+            READ line FROM pFileName
+            READ line FROM pFileName                                                                
+            WHILE fileStream NOT EOF(End of File)                                                   
+                outLineNum <- outLineNum + 1
+                READ line FROM theFIle
+            ENDWHILE                                                                                
+            CLOSEFILE fileStream
+            IF outLineNum = 0 THEN
+                PRINT "File contains no data! Please enter a file that contains teams."
+            ENDIF
+            IF outLineNum > 32 THEN                                                                 
+                PRINT "Error in processing: File entries exceeding 32, only first 32 recorded"
+                outLineNum <- 32
+            ENDIF
+        ENDTRY
+        CATCH IOException errorDetails                                                              
+            IF fileStream NOT null THEN
+                TRY
+                    CLOSE filestream;
+                CATCH IOexception ex2
+                ENDCATCH
+            ENDIF
+            PRINT "Error in fileProcessing: " + errorDetails.getMessage()
+        ENDCATCH
+        RETURN outLineNum
+    
+    METHOD: getString
+    IMPORT: pPrompt (String)
+    EXPORT: outString (String)
+    ASSERTION: Ask user for a string with prompt, handle errors and exceptions
+    ALGORITHM: 
+        boolean validInput <- false
+        outString <- ""
+        WHILE NOT validInput                                                                        
+            TRY   
+                DO                                                                                  
+                    outString <- ASK USER WITH PROMPT pPrompt
+                    outStringLength <- LENGTH OF outString                                          
+                    IF outString IS EMPTY OR outString IS NULL THEN                                  
+             			PRINT "Empty-null string, please re-enter"
+                    ENDIF
+                    IF FIRST CHARACTER OF outString IS ' ' OR LAST CHARACATER OF outString IS ' ' THEN 
+                        PRINT "Error in formatting, space before or after word."
+                    ENDIF
+                WHILE outString IS EMPTY OR outString IS NULL OR FIRST CHARACTER OF outString IS ' ' OR LAST CHARACATER OF outString IS ' '
+                validInput <- TRUE                                                                  
+            ENDTRY
+            CATCH InputMismatchException error              
+                PRINT "Something went wrong! The error: " + error
+            ENDCATCH
+            CATCH StringIndexOutOfBoundsException error                                             
+            ENDCATCH
+        RETURN outString;   
+ 
+    METHOD: readFile
+    IMPORT: pFileName (String), pTeamArray (Team)
+    EXPORT: outSring (String)
+    ASSERTION: Read Csv File lines to store them in team objects within array teamArray
+    ALGORITHM:
+        TRY
+            fileStream <- OPENFILE pFileName
+            lineNum <- 0 (Integer)
+            READ line FROM pFileName
+            READ line FROM pFileName                                                                
+            WHILE fileStream NOT EOF(End of File) AND lineNum < 32                                  
+                pTeamArray[lineNum] <- processLine(line)
+                lineNum <- lineNum + 1
+                READ line FROM theFIle
+            ENDWHILE                                                                                
+            IF lineNum = 0 THEN
+                PRINT "File contains no data! Please enter a file that contains teams."
+            ENDIF
+            CLOSEFILE fileStream
+        ENDTRY
+        CATCH IOException errorDetails                                                             
+            IF fileStream NOT null THEN
+                TRY
+                    CLOSE filestream;
+                ENDTRY
+                CATCH IOexception ex2
+                ENDCATCH
+            ENDIF
+            PRINT "Error in fileProcessing: " + errorDetails.getMessage()
+        ENDCATCH
+        CATCH ArrayIndexOutOfBoundsException errorDetails
+        ENDCATCH
+        RETURN pTeamArray;
+    
+    METHOD: processLine
+    IMPORT: csvRow (String)
+    EXPORT: outTeam (Team)
+    ASSERTION: Parse row into seperate data for each team object field, create new Team object with these fields and return
+    ALGORITHM:
+        splitLine <- csvRow.split(",")                                                              
+        teamName <- PARSE string splitLine[0]                                                       
+        teamCode <- PARSE string splitLine[1]                                                       
+        goalsScored <- PARSE integer splitLine[2]                                                  
+        goalsLost <- PARSE integer splitLine[3]                                                   
+        teamGroup <- PARSE character splitLine[4]                                                
+        outTeam <- Team(teamName, teamCode, goalsScored, goalsLost, teamGroup)                  
+        RETURN outTeam
+        
+    METHOD: groupOrOverallAnalysis
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Ask user with prompt whether group or overall analysis or exit required, loop if not to exit
+    ALGORITHM:
+        notExit <- 'N'                                                                             
+        WHILE notExit = 'N' OR notExit = 'n'                                                        
+            PRINT "What form of analysis do you require:"
+            groupOrOverall <- getInt(1,2,"(1) Overall analysis or\n(2) Group analysis?","Enter integer 1 or 2") 
+            IF groupOrOverall = 1 THEN                                                              
+                overallAnalysis(pTeamArray)                                                        
+                notExit <- getCharExit("\nWould you like to exit: \n(Y) Yes.\n(N) No.")             
+            ENDIF
+            IF groupOrOverall = 2 THEN                                                             
+                groupAnalysis(pTeamArray)                                                         
+                notExit <- getCharExit("\nWould you like to exit: \n(Y) Yes.\n(N) No.")            
+            ENDIF
+        ENDWHILE        
+    
+    METHOD: overallAnalysis
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Provide analysis options of overall teams in menu
+    ALGORITHM:
+        PRINT "What overall analysis do you require?:"
+        printAnalysisMenu()                                                                         
+        analysisType <- getInt(1,4,"","Enter and integer from 1 to 4")                             
+        SWITCH analysisType CASE CHOICE OF                                                        
+            1 
+                displaySortNetGoals(pTeamArray)                                                  
+            2
+                displaySortGoalsLost(pTeamArray);                                              
+            3
+                displaySortGoals(pTeamArray);                                                 
+            4
+                displayBestTeam(pTeamArray);                                                 
+        ENDSWITCH        
+    
+    METHOD: printAnalysisMenu
+    IMPORT: none
+    EXPORT: none
+    ASSERTION: Print the analysis options for both overall and group analysis
+    ALGORITHM:
+        PRINT "(1) Display teams sorted by net goals in descending order."
+        PRINT "(2) Display teams sorted by total goals scored against them in descending order."
+        PRINT "(3) Display teams sorted by total goals they scored in descending order."
+        PRINT "(4) Display best performing team: team with highest net goals."
+
+    METHOD: displaySortNetGoals
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Print teams sorted by net goals descending
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray                                                           
+        sortedNetGoalsArray <- ARRAY OF Teams SIZE numTeams                                       
+        netGoalsArray <- ARRAY OF Integers SIZE numTeams                                         
+        sortedNetGoalsArray <- bubbleSortNetGoals(pTeamArray)                                   
+        netGoalsArray <- netGoals(sortedNetGoalsArray)                                        
+        PRINT "This is the teams sorted by net goals descending:"
+        IF numTeams > 0 THEN                                                                 
+            FOR i = 0 to numTeams INCREMENT BY 1
+                PRINT (i+1) +". Team name: " + sortedNetGoalsArray[i].getTeamName() + "\n"
+                PRINT"Net goals: " + netGoalsArray[i] + "\n\n"
+            ENDFOR
+        ENDIF
+ 
+    METHOD: netGoals
+    IMPORT: pTeamArray (Team)
+    EXPORT: outNetGoalsArray (Integer)
+    ASSERTION: Display net goals of each team in team array
+    ALGORITHM:
+        netGoals <- 0 (Integer)
+        numTeams <- 0 (Integer)
+        numTeams <- LENGTH OF pTeamArray                                                           
+        outNetGoalsArray <- ARRAY OF Integers SIZE numTeams                                       
+        FOR i = 0 to numTeams INCREMENT By 1                                                      
+            netGoals <- pTeamArray[i].getGoalsScored() - pTeamArray[i].getGoalsLost()
+            outNetGoalsArray[i] <- netGoals
+        ENDFOR
+        RETURN outNetGoalsArray
+
+    METHOD: bubbleSortNetGoals
+    IMPORT: pTeamArray (Team)
+    EXPORT: pTeamArray (Team)
+    ASSERTION: bubbleSort the pTeamArray array of team objects by net goals of each team
+    ALGORITHM:
+        FOR pass = 0 TO pTeamArray.length - 1 INCREMENT BY 1                                      
+            FOR i = 0 TO pTeamArray.length - 1 - pass INCREMENT BY 1
+                IF pTeamArray[i].getGoalsScored() - pTeamArray[i].getGoalsLost() <= pTeamArray[i+1].getGoalsScored() - pTeamArray[i+1].getGoalsLost() THEN
+                    temp <- pTeamArray[i]
+                    pTeamArray[i] <- pTeamArray[i + 1]
+                    pTeamArray[i + 1] <- temp
+                ENDIF
+            ENDFOR
+        ENDFOR
+        RETURN pTeamArray
+
+    METHOD: displaySortGoalsLost
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: display teams sorted by goals scored against them, descending
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray                                                           
+        sortedGoalsLostArray <- ARRAY OF Teams SIZE numTeams                                      
+        sortedGoalsLostArray <- bubbleSortGoalsLost(pTeamArray)                                   
+        PRINT "This is the teams sorted by goals scored against them, in descending order:\n"
+        IF numTeams > 0 THEN                                                                       
+            FOR int i = 0 to numTeams INCREMENT BY 1
+                PRINT (i+1) + ". Team name: " + sortedGoalsLostArray[i].getTeamName() + "\n"
+                PRINT "Total goals scored against them: " + sortedGoalsLostArray[i].getGoalsLost() + "\n\n"
+            ENDFOR
+        ENDIF
+ 
+    METHOD: bubbleSortGoalsLost
+    IMPORT: pTeamArray (Team)
+    EXPORT: pTeamArray (Team)
+    ASSERTION: bubbleSort the goals scored against the teams stored in pTeamArray in descending order
+    ALGORITHM: 
+        FOR pass = 0 TO pTeamArray.length - 1 INCREMENT BY 1                                       
+            FOR i = 0 TO pTeamArray.length - 1 - pass INCREMENT BY 1
+                IF pTeamArray[i].getGoalsLost() <= pTeamArray[i+1].getGoalsLost() THEN
+                    temp <- pTeamArray[i]
+                    pTeamArray[i] <- pTeamArray[i + 1]
+                    pTeamArray[i + 1] <- temp
+                ENDIF
+            ENDFOR
+        ENDFOR
+        RETURN pTeamArray
+    
+    METHOD: displaySortGoals
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: display teams sorted by goals scored in descending order
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray                                                           
+        sortedGoalsArray <- ARRAY OF Teams SIZE numTeams                                          
+        sortedGoalsArray <- bubbleSortGoals(pTeamArray)                                          
+        PRINT "This is the teams sorted by goals scored by them, in descending order:\n"
+        IF numTeams > 0 THEN                                                                       
+            FOR int i = 0 TO numTeams INCREMENT BY 1
+                PRINT (i+1) + ". Team name: " + sortedGoalsArray[i].getTeamName() + "\n"
+                PRINT "Toal goals scored: " + sortedGoalsArray[i].getGoalsScored() + "\n\n"
+            ENDFOR
+        ENDIF
+ 
+    METHOD: bubbleSortGoals
+    IMPORT: pTeamArray (Team)
+    EXPORT: pTeamArray (Team)
+    ASSERTION: bubbleSort the goals scored bythe teams stored in pTeamArray, in descending order
+    ALGORITHM: 
+        FOR pass = 0 TO pTeamArray.length - 1 INCREMENT BY 1                                       
+            FOR i = 0 TO pTeamArray.length - 1 - pass INCREMENT BY 1
+                IF pTeamArray[i].getGoalsScored() <= pTeamArray[i+1].getGoalsScored() THEN
+                    temp <- pTeamArray[i]
+                    pTeamArray[i] <- pTeamArray[i + 1]
+                    pTeamArray[i + 1] <- temp
+                ENDIF
+            ENDFOR
+        ENDFOR
+        RETURN pTeamArray
+
+    METHOD: displayBestTeam
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Displays the team with the highest net goals to user
+    ALGORITHM:
+        numTeams <- LENGTH OF pTeamArray                                                           
+        sortedNetGoalsArray <- ARRAY OF Teams SIZE numTeams                                       
+        netGoalsArray <- ARRAY OF Intgers SIZE numTeams                                          
+        sortedNetGoalsArray <- bubbleSortNetGoals(pTeamArray)                                      
+        netGoalsArray <- netGoals(sortedNetGoalsArray)                                            
+        PRINT "This is the best performing team (with highest net goals):"           
+        PRINT "Team name: " + sortedNetGoalsArray[0].getTeamName()                                
+        PRINT "Net goals: " + netGoalsArray[0]
+
+    METHOD: groupAnalysis
+    IMPORT: pTeamArray (Team)
+    EXPORT: none
+    ASSERTION: Complete analysis options of teams in a group
+    ALGORITHM:
+        numGroup <- 0 (Integer)
+        numTeams <- LENGTH OF pTeamArray                                                            
+        chosenGroup <- getCharGroup("Enter the group you wish to analyse (A, B, C, D, E, F, G or H):") 
+        numGroup <- numTeamInGroup(pTeamArray, chosenGroup)                                         
+        IF numGroup > 0 THEN                                                                        
+            groupArray <- ARRAY OF Teams SIZE numGroup                                              
+            groupArray <- occupyGroupArray(pTeamArray, groupArray, chosenGroup)                     
+            PRINT "What group analysis do you require?:"
+            printAnalysisMenu()                                                                     
+            analysisType <- getInt(1,4,"","Enter and integer from 1 to 4")                           
+            SWITCH analysisType CASE CHOICE OF                                                      
+                1 
+                    displaySortNetGoals(groupArray)                                                 
+                2
+                    displaySortGoalsLost(groupArray)                                               
+                3
+                    displaySortGoals(groupArray)                                                      
+                4
+                    displayBestTeam(groupArray)                                                     
+            ENDSWITCH
+        ENDIF
+        ELSE
+            PRINT"No teams in group"
+        ENDELSE
+    
+    METHOD: occupyGroupArray
+    IMPORT: pTeamArray (Team), pGroupArray (Team), pChosenGroup (Integer)
+    EXPORT: outGroupArray (Team)
+    ASSERTION: Occupy the outGroupArray with teams within selected group
+    ALGORITHML:
+        numTeams <- LENGTH OF pTeamArray                                                            
+        i <- 0 (Integer)
+        j <- 0 (Integer)
+        WHILE i < numTeams                                                                          
+            IF pTeamArray[i].getTeamGroup() = pChosenGroup THEN                                    
+                pGroupArray[j] <- pTeamArray[i]                                                     
+                j <- j + 1
+            ENDIF
+            i <- i + 1                                                                            
+        ENDWHILE
+        RETURN pGroupArray
+
+    METHOD: numTeamInGroup
+    IMPORT: pTeamArray (Team), pChosenGroup (Char)
+    EXPORT: outNumGroup (Integer)
+    ASSERTION: get the number of teams within selected group
+    ALGORITHM:
+        outNumGroup <- 0 (Integer)
+        numTeams <- LENGTH OF pTeamArray                                                           
+        FOR int i = 0 TO numTeams INCREMENT BY 1                                                   
+            IF pTeamArray[i].getTeamGroup() = pChosenGroup THEN                                    
+                outNumGroup <- outNumGroup + 1
+            ENDIF
+        ENDFOR
+        RETURN outNumGroup
+    
+    METHOD: getInt
+    IMPORT: pMin (Integer), pMax (Integer), pPrompt (String), 
+    EXPORT: outInt (Integer)
+    ASSERTION: Ask user with String pPrompt for integer between pMin and pMax, OutRangeError print when input outside range
+    ALGORITHM:
+    ALGORITHM:
+        validInput <- FALSE
+        outInt <- 0
+        WHILE NOT validInput is TRUE                                                               
+            TRY                                                                                   
+                DO                                                                               
+                    outInt <- ASK USER WITH PROMPT pPrompt                                      
+                    IF outInt < pMin) OR outInt > pMax THEN                                        
+                        PRINT pOutRangeError
+                    ENDIF
+                WHILE outInt < pMin OR outInt > pMax 
+                validInput <- TRUE                                                                
+            ENDTRY
+            CATCH InputMismatchException error                                                    
+                PRINT "Enter an integer number character"
+			ENDCATCH
+        ENDWHILE        
+        RETUN outInt   
+ 
+    METHOD: getCharGroup
+    IMPORT: pPrompt (String)
+    EXPORT: outChar (Character)
+    ASSERTION: Ask for a group character with prompt, handle errors and exceptions
+    ALGORITHM:
+        validInput <- false (boolean)
+        outChar <- ' ' (Character)
+        WHILENOT validInput                                                                       
+            TRY                                                                                     
+                WHILE outChar NOT 'A' OR  outChar NOT 'B' OR outChar NOT 'C' OR outChar NOT 'D' OR outChar NOT 'E' OR outChar NOT 'F' OR outChar NOT 'G' OR outChar NOT 'H'
+                    PRINT pPrompt
+                    outChar <- INPUT NEXT CHARACTER                                                
+                    IF outChar NOT 'A' OR  outChar NOT 'B' OR outChar NOT 'C' OR outChar NOT 'D' OR outChar NOT 'E' OR outChar NOT 'F' OR outChar NOT 'G' OR outChar NOT 'H' THEN
+                        PRINT "Team group invalid, enter group A, B, C, D, E, F, G or H"
+                    END IF
+                ENDWHILE
+                validInput <- true
+            ENDTRY
+            CATCH InputMismatchException error                                                    
+                PRINT "Something went wrong! The error: " + error
+            ENDCATCH
+        ENDWHILE
+        RETURN outChar
+    
+    METHOD: getCharExit
+    IMPORT: pPrompt (String)
+    EXPORT: outChar (Character)
+    ASSERTION: Ask for an exit character with prompt, handle errors and exceptions
+    ALGORTIHM:
+        validInput <- false (boolean)
+        outChar <- ' ' (Character)
+        WHILENOT validInput                                                                        
+            TRY                                                                                     
+                WHILE outChar NOT 'Y OR outChar NOT 'y' OR outChar NOT 'N' OR outChar NOT 'n'
+                    PRINT pPrompt
+                    outChar <- INPUT NEXT CHARACTER                                                 
+                    IF outCharNOT 'Y OR outChar NOT 'y' OR outChar NOT 'N' OR outChar NOT 'n' THEN
+                        PRINT "Enter character Y or N" // Print Invalid input if invalid character input
+                    END IF
+                ENDWHILE
+                validInput <- true
+            ENDTRY
+            CATCH InputMismatchException error                                                     
+                PRINT "Something went wrong! The error: " + error
+            ENDCATCH
+        ENDWHILE
+        RETURN outChar
+
+END DataAnalysis
